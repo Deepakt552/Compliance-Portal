@@ -23,6 +23,7 @@ Route::get('/view-pdf/{fileName}', function ($fileName) {
 //users
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
 Route::post('/users/{user}/update-vacant-status', [UserController::class, 'updateVacantStatus'])->name('users.updateVacantStatus');
@@ -33,6 +34,9 @@ Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.e
 Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
 Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 Route::get('/users/search', [UserController::class, 'search'])->name('users.search');
+
+Route::get('/admins/search', [AdminController::class, 'search'])->name('admins.search');
+Route::resource('/admins', AdminController::class);
 
 
 

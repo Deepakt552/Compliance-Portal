@@ -43,6 +43,7 @@
                     ['route' => 'household.index', 'icon' => 'fa-home', 'label' => 'Manage Household'],
                     ['route' => 'documents.index', 'icon' => 'fa-file-alt', 'label' => 'Manage Documents'],
                     ['route' => 'properties.index', 'icon' => 'fa-building', 'label' => 'Manage Properties'],
+                    ['route' => 'admins.index', 'icon' => 'fa-user-shield', 'label' => 'Manage Admins'],
                 ];
             @endphp
 
@@ -141,6 +142,8 @@
                     Document Compliance
                 @elseif(request()->routeIs('properties.*'))
                     Property Management
+                @elseif(request()->routeIs('admins.*'))
+                    Admin Management
                 @else
                     Admin Console
                 @endif
