@@ -67,17 +67,17 @@
                                     <input type="hidden" name="document_id" value="{{ $document->id }}">
 
                                     <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                                        <i class="fas fa-paperclip mr-1"></i> Select Replacement PDF
+                                        <i class="fas fa-paperclip mr-1"></i> Select Replacement File
                                     </label>
 
                                     {{-- Styled file input card --}}
                                     <div class="relative flex items-center border-2 border-dashed border-red-300 bg-white rounded-xl px-4 py-3 hover:border-[#ef3b45] transition group cursor-pointer">
-                                        <i class="fas fa-file-pdf text-[#ef3b45] text-lg mr-3 group-hover:scale-110 transition-transform"></i>
+                                        <i class="fas fa-file-upload text-[#ef3b45] text-lg mr-3 group-hover:scale-110 transition-transform"></i>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-[10px] font-semibold text-gray-600">Click to choose a PDF file</p>
-                                            <p class="text-[9px] text-gray-400 mt-0.5">Max 10MB · PDF only</p>
+                                            <p class="text-[10px] font-semibold text-gray-600">Click to choose a file</p>
+                                            <p class="text-[9px] text-gray-400 mt-0.5">Max 5MB (PDF, Image, Excel, CSV)</p>
                                         </div>
-                                        <input type="file" name="document" required accept="application/pdf"
+                                        <input type="file" name="document" required accept="image/*,application/pdf,.csv,.xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                                         <span class="reupload-filename text-[10px] text-[#ef3b45] font-bold ml-2 truncate max-w-[120px] hidden"></span>
                                     </div>

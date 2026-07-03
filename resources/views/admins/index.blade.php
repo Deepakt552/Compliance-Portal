@@ -28,11 +28,12 @@
         <div class="bg-white rounded-2xl border border-gray-200/80 p-6">
             <form method="GET" action="{{ route('admins.search') }}" class="flex flex-col sm:flex-row gap-3">
                 <div class="relative flex-1">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none">
                         <i class="fas fa-search text-xs"></i>
                     </span>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or email address..."
-                           class="pl-9 pr-4 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-xs py-2.5">
+                           class="pl-9 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#ef3b45] focus:ring focus:ring-[#ef3b45] focus:ring-opacity-20 text-sm py-2.5"
+                           style="padding-left: 2.25rem;">
                 </div>
                 <div class="flex space-x-2">
                     <button type="submit"

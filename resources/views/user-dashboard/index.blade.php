@@ -146,11 +146,12 @@
 
                                     <!-- Search Requirements Box -->
                                     <div class="relative w-full">
-                                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-gray-400">
+                                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-gray-400 pointer-events-none">
                                             <i class="fas fa-search text-[10px]"></i>
                                         </span>
                                         <input type="text" x-model="searchQuery" placeholder="Search requirements..."
-                                               class="pl-8 pr-3 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-[11px] py-1.5">
+                                               class="pl-8 pr-3 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-[11px] py-1.5"
+                                               style="padding-left: 2.25rem;">
                                     </div>
                                 </div>
 
@@ -237,12 +238,12 @@
 
                                                                     {{-- File picker --}}
                                                                     <div class="upload-dropzone relative flex-1 flex items-center border border-dashed border-gray-300 bg-gray-50 rounded-lg px-2.5 py-1.5 hover:border-[#ef3b45] hover:bg-red-50/20 transition group cursor-pointer overflow-hidden">
-                                                                        <i class="fas fa-file-pdf text-gray-300 group-hover:text-[#ef3b45] text-sm mr-1.5 flex-shrink-0 transition-colors"></i>
+                                                                        <i class="fas fa-file-upload text-gray-300 group-hover:text-[#ef3b45] text-sm mr-1.5 flex-shrink-0 transition-colors"></i>
                                                                         <div class="flex-1 min-w-0">
-                                                                            <p class="upload-placeholder text-[10px] font-semibold text-gray-400 group-hover:text-[#ef3b45] transition-colors truncate">Choose PDF</p>
+                                                                            <p class="upload-placeholder text-[10px] font-semibold text-gray-400 group-hover:text-[#ef3b45] transition-colors truncate">Choose File (Max 5MB)</p>
                                                                             <p class="upload-selected-name text-[10px] font-bold text-[#ef3b45] hidden truncate"></p>
                                                                         </div>
-                                                                        <input type="file" name="document" required accept="application/pdf"
+                                                                        <input type="file" name="document" required accept="image/*,application/pdf,.csv,.xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
                                                                                class="upload-file-input absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                                                                     </div>
 

@@ -62,7 +62,7 @@ class UserDashboardController extends Controller
             }
     
             $request->validate([
-                'document' => 'required|file|mimes:pdf,docx|max:102048',
+                'document' => 'required|file|mimes:pdf,docx,doc,jpg,jpeg,png,gif,svg,webp,xlsx,xls,csv|max:5120',
                 'family_member_id' => 'required|exists:household_data,id',
                 'document_number' => 'required|integer|min:1|max:30', // Adjusted to allow up to 30 documents
             ]);
@@ -176,7 +176,7 @@ if ($property) {
     
             // Validate the request
             $request->validate([
-                'document' => 'required|file|mimes:pdf,docx|max:2048',
+                'document' => 'required|file|mimes:pdf,docx,doc,jpg,jpeg,png,gif,svg,webp,xlsx,xls,csv|max:5120',
                 'family_member_id' => 'required|exists:household_data,id',
                 'document_number' => 'required|integer|min:1|max:30',
             ]);

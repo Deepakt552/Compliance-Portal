@@ -12,11 +12,12 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-150 p-6">
             <form action="{{ route('documents.search') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3">
                 <div class="relative flex-1 w-full">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none">
                         <i class="fas fa-search text-xs"></i>
                     </span>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by first name or last name of members"
-                           class="pl-9 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
+                           class="pl-9 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5"
+                           style="padding-left: 2.25rem;">
                 </div>
                 <div class="flex items-center space-x-2 w-full sm:w-auto">
                     <button type="submit"
