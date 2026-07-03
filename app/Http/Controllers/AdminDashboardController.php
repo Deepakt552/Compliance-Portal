@@ -125,6 +125,14 @@ class AdminDashboardController extends Controller
     
         // Save the notification
         $notification->save();
+
+        // Audit Log
+        \App\Services\AuditLogger::log('approve', 'document', $document->id, [
+            'document_name' => $document->document_name,
+            'document_number' => $document->document_number,
+            'family_member' => $familyMember ? ($familyMember->firstName . ' ' . $familyMember->lastName) : 'N/A',
+            'user_email' => $user ? $user->email : 'N/A',
+        ]);
     
         // Send email to the user
         Mail::to($user->email)->send(new DocumentApproved($document));
@@ -158,11 +166,19 @@ class AdminDashboardController extends Controller
             'user_id' => $user->id,
             'family_member_id' => $familyMember->id,
             'role' =>'Admin',
-
         ]);
     
         // Save the notification
         $notification->save();
+
+        // Audit Log
+        \App\Services\AuditLogger::log('reject', 'document', $document->id, [
+            'document_name' => $document->document_name,
+            'document_number' => $document->document_number,
+            'comments' => $request->input('comments'),
+            'family_member' => $familyMember ? ($familyMember->firstName . ' ' . $familyMember->lastName) : 'N/A',
+            'user_email' => $user ? $user->email : 'N/A',
+        ]);
     
         // Send email to the user
         Mail::to($user->email)->send(new DocumentRejected($document));

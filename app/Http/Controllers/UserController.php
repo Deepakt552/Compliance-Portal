@@ -77,6 +77,13 @@ class UserController extends Controller
         $user->password = bcrypt($request->password);
         $user->save();
 
+        \App\Services\AuditLogger::log('create', 'user', $user->id, [
+            'name' => $user->name,
+            'email' => $user->email,
+            'UserId' => $user->UserId,
+            'Code' => $user->Code,
+        ]);
+
         return redirect()->route('users.index')->with('success', 'User created successfully');
     }
 
@@ -116,6 +123,13 @@ class UserController extends Controller
         }
 
         $user->update($data);
+
+        \App\Services\AuditLogger::log('update', 'user', $user->id, [
+            'name' => $user->name,
+            'email' => $user->email,
+            'UserId' => $user->UserId,
+            'Code' => $user->Code,
+        ]);
     
         return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
@@ -123,7 +137,18 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        $userData = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'UserId' => $user->UserId,
+            'Code' => $user->Code,
+        ];
+        $userId = $user->id;
+
         $user->delete();
+
+        \App\Services\AuditLogger::log('delete', 'user', $userId, $userData);
+
         return redirect()->route('users.index')->with('success', 'User deleted successfully');
     }
 }

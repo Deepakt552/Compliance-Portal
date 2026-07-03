@@ -33,10 +33,15 @@ class AdminController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        Admin::create([
+        $newAdmin = Admin::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+
+        \App\Services\AuditLogger::log('create', 'admin', $newAdmin->id, [
+            'name' => $newAdmin->name,
+            'email' => $newAdmin->email,
         ]);
 
         return redirect()->route('admins.index')->with('success', 'Admin created successfully.');
@@ -71,6 +76,11 @@ class AdminController extends Controller
 
         $admin->update($data);
 
+        \App\Services\AuditLogger::log('update', 'admin', $admin->id, [
+            'name' => $admin->name,
+            'email' => $admin->email,
+        ]);
+
         return redirect()->route('admins.index')->with('success', 'Admin updated successfully.');
     }
 
@@ -81,7 +91,15 @@ class AdminController extends Controller
             return redirect()->route('admins.index')->with('error', 'You cannot delete your own admin account.');
         }
 
+        $adminData = [
+            'name' => $admin->name,
+            'email' => $admin->email,
+        ];
+        $adminId = $admin->id;
+
         $admin->delete();
+
+        \App\Services\AuditLogger::log('delete', 'admin', $adminId, $adminData);
 
         return redirect()->route('admins.index')->with('success', 'Admin deleted successfully.');
     }

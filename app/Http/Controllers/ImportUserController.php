@@ -108,6 +108,13 @@ class ImportUserController extends Controller
                 'Code'                => $row['code'] ?? null,
             ]);
 
+            \App\Services\AuditLogger::log('import', 'user', $user->id, [
+                'name' => $user->name,
+                'email' => $user->email,
+                'UserId' => $user->UserId,
+                'Code' => $user->Code,
+            ]);
+ 
             return response()->json(['success' => true, 'message' => "User '{$user->FirstName} {$user->LastName}' imported successfully."]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);

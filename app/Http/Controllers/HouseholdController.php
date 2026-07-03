@@ -98,7 +98,13 @@ class HouseholdController extends Controller
             return redirect()->back()->withInput()->withErrors(['error' => 'A family member with this name and property code already exists in the database.']);
         }
 
-        HouseholdData::create($request->all());
+        $member = HouseholdData::create($request->all());
+
+        \App\Services\AuditLogger::log('create', 'household_member', $member->id, [
+            'name' => $member->firstName . ' ' . $member->lastName,
+            'Code' => $member->Code,
+            'userId' => $member->userId,
+        ]);
 
         return redirect()->route('household.index')->with('success', 'Household data created successfully.');
     }
@@ -143,12 +149,28 @@ class HouseholdController extends Controller
         
         $householdData->update($request->all());
 
+        \App\Services\AuditLogger::log('update', 'household_member', $householdData->id, [
+            'name' => $householdData->firstName . ' ' . $householdData->lastName,
+            'Code' => $householdData->Code,
+            'userId' => $householdData->userId,
+        ]);
+
         return redirect()->route('household.index')->with('success', 'Household data updated successfully.');
     }
 
     public function destroy($id)
     {
-        HouseholdData::findOrFail($id)->delete();
+        $member = HouseholdData::findOrFail($id);
+        $memberData = [
+            'name' => $member->firstName . ' ' . $member->lastName,
+            'Code' => $member->Code,
+            'userId' => $member->userId,
+        ];
+        $memberId = $member->id;
+
+        $member->delete();
+
+        \App\Services\AuditLogger::log('delete', 'household_member', $memberId, $memberData);
 
         return redirect()->route('household.index')->with('success', 'Household data deleted successfully.');
     }
@@ -200,6 +222,12 @@ class HouseholdController extends Controller
                 'dob'                 => $dob,
                 'Code'                => $code,
                 'gender'              => $row['gender'] ?? null,
+            ]);
+
+            \App\Services\AuditLogger::log('import', 'household_member', $member->id, [
+                'name' => $member->firstName . ' ' . $member->lastName,
+                'Code' => $member->Code,
+                'userId' => $member->userId,
             ]);
 
             return response()->json(['success' => true, 'message' => "Member '{$member->firstName} {$member->lastName}' imported."]);
