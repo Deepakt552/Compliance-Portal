@@ -68,6 +68,7 @@
                             <tr>
                                 <th class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Admin Name</th>
                                 <th class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Email Address</th>
+                                <th class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Upload Alerts</th>
                                 <th class="px-6 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Date Registered</th>
                                 <th class="px-6 py-3 text-right text-[10px] font-bold text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
@@ -93,6 +94,19 @@
                                     <!-- Email Address -->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
                                         {{ $admin->email }}
+                                    </td>
+
+                                    <!-- Upload Alerts -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($admin->receive_upload_notifications)
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-green-50 text-green-700 border border-green-200 shadow-sm">
+                                                <i class="fas fa-bell mr-1"></i> Active
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-gray-50 text-gray-400 border border-gray-150">
+                                                <i class="fas fa-bell-slash mr-1"></i> Muted
+                                            </span>
+                                        @endif
                                     </td>
 
                                     <!-- Date Registered -->

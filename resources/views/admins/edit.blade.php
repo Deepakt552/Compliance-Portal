@@ -54,6 +54,21 @@
                     </div>
                 </div>
 
+                <!-- Notifications Toggle -->
+                <div class="pt-4 border-t border-gray-100">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="receive_upload_notifications" name="receive_upload_notifications" type="checkbox" value="1"
+                                   {{ old('receive_upload_notifications', $admin->receive_upload_notifications) ? 'checked' : '' }}
+                                   class="focus:ring-[#0e1e3a] h-4 w-4 text-[#0e1e3a] border-gray-300 rounded cursor-pointer">
+                        </div>
+                        <div class="ml-3 text-xs">
+                            <label for="receive_upload_notifications" class="font-bold text-gray-700 uppercase tracking-wider cursor-pointer">Receive Document Upload Notifications</label>
+                            <p class="text-gray-400 mt-0.5">Toggle to subscribe this administrator to real-time user document upload email alerts.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="pt-4 border-t border-gray-100 flex justify-end space-x-2">
                     <a href="{{ route('admins.index') }}"

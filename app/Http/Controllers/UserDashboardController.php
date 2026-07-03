@@ -120,7 +120,23 @@ if ($property) {
 
     
             $notification->save();
-            Mail::to($user->email)->send(new DocumentUploaded($document));
+            
+            try {
+                Mail::to($user->email)->send(new DocumentUploaded($document));
+            } catch (\Exception $e) {
+                // Ignore mail sending error
+            }
+
+            // Retrieve all admins subscribed to document upload alerts
+            $subscribedAdmins = \App\Models\Admin::where('receive_upload_notifications', true)->get();
+            foreach ($subscribedAdmins as $admin) {
+                try {
+                    Mail::to($admin->email)->send(new DocumentUploaded($document));
+                } catch (\Exception $e) {
+                    // Ignore mail sending error
+                }
+            }
+
             return response()->json(['message' => 'Document uploaded successfully'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred during document upload'], 500);

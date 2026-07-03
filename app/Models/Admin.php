@@ -23,6 +23,7 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
+        'receive_upload_notifications',
     ];
 
     /**
@@ -42,5 +43,6 @@ class Admin extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'receive_upload_notifications' => 'boolean',
     ];
 }
