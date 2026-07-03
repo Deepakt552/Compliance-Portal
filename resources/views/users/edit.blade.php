@@ -14,7 +14,7 @@
                 <p class="text-xs text-gray-400 mt-1">Modify details for primary user: {{ $user->FirstName }} {{ $user->LastName }}.</p>
             </div>
 
-            <form action="{{ route('users.update', $user->id) }}" method="POST" class="p-6 md:p-8 space-y-6">
+            <form action="{{ route('users.update', $user->id) }}" method="POST" class="p-6 md:p-8 space-y-6" autocomplete="off">
                 @csrf
                 @method('PUT')
 
@@ -22,21 +22,21 @@
                     <!-- Name -->
                     <div>
                         <label for="name" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Display Name</label>
-                        <input type="text" name="name" id="name" value="{{ $user->name }}" required
+                        <input type="text" name="name" id="name" value="{{ $user->name }}" required autocomplete="off"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Email Address</label>
-                        <input type="email" name="email" id="email" value="{{ $user->email }}" required
+                        <input type="email" name="email" id="email" value="{{ $user->email }}" required autocomplete="off"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- Password -->
                     <div>
-                        <label for="password" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Password (Leave unchanged to keep existing)</label>
-                        <input type="password" name="password" id="password" value="{{ $user->password }}" required
+                        <label for="password" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Password (Leave blank to keep existing)</label>
+                        <input type="password" name="password" id="password" autocomplete="new-password"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 

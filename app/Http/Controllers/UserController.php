@@ -87,7 +87,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'UserId' => 'nullable',
@@ -102,9 +102,20 @@ class UserController extends Controller
             'ContactDetails' => 'nullable',
             'PhoneNumber' => 'nullable',
             'Code' => 'nullable',
-        ]);
+        ];
+
+        if ($request->filled('password')) {
+            $rules['password'] = 'required|min:6';
+        }
+
+        $request->validate($rules);
     
-        $user->update($request->all());
+        $data = $request->except('password');
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        $user->update($data);
     
         return redirect()->route('users.index')->with('success', 'User updated successfully');
     }

@@ -58,7 +58,7 @@
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-100">
                         <button type="button" id="start-btn" disabled
                                 class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-gray-300 text-gray-500 font-bold rounded-xl transition shadow-sm cursor-not-allowed">
-                            <i class="fas fa-play mr-2"></i> Start Live Import
+                            <i class="fas fa-play mr-2"></i>  Import user
                         </button>
                         
                         <a href="{{ asset('User Credentials March.xlsx') }}" download
