@@ -51,9 +51,9 @@
             </div>
 
             <!-- Main Upload Section -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-150 p-6">
-                <div class="border-b border-gray-150 pb-4 mb-6">
-                    <h2 class="text-base font-bold text-[#0e1e3a]"><i class="fas fa-file-upload mr-2 text-gray-400"></i>Upload Family Members Documents</h2>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-150 p-3 sm:p-5">
+                <div class="border-b border-gray-150 pb-3 mb-4">
+                    <h2 class="text-sm font-bold text-[#0e1e3a]"><i class="fas fa-file-upload mr-2 text-gray-400"></i>Upload Family Members Documents</h2>
                     <p class="text-xs text-gray-400 mt-1">Select a family member below to view and upload their required compliance documents.</p>
                 </div>
 
@@ -98,7 +98,7 @@
                             </button>
 
                             <!-- Member Accordion Content -->
-                            <div x-show="isOpen" class="px-5 py-5 border-t border-gray-150 space-y-6" style="display: none;">
+                            <div x-show="isOpen" class="px-3 py-4 border-t border-gray-150 space-y-5" style="display: none;">
                                 <!-- Member Metadata Grid -->
                                 <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     <div>
@@ -123,107 +123,152 @@
                                     </div>
                                 </div>
 
-                                <!-- Filter Controls (Tab filters & live search box) -->
-                                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <!-- Filter Controls -->
+                                <div class="flex flex-col gap-2">
                                     <!-- Status Tabs -->
-                                    <div class="flex items-center space-x-1.5 bg-gray-100 p-1 rounded-xl self-start">
-                                        <button @click="activeTab = 'all'" 
+                                    <div class="flex items-center space-x-1 bg-gray-100 p-1 rounded-xl self-start flex-wrap">
+                                        <button @click="activeTab = 'all'"
                                                 :class="{'bg-white text-gray-850 shadow-sm': activeTab === 'all', 'text-gray-500 hover:text-gray-850': activeTab !== 'all'}"
-                                                class="px-4 py-1.5 rounded-lg text-xs font-bold transition">
+                                                class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition">
                                             All (30)
                                         </button>
                                         <button @click="activeTab = 'uploaded'"
                                                 :class="{'bg-white text-green-700 shadow-sm': activeTab === 'uploaded', 'text-gray-500 hover:text-gray-850': activeTab !== 'uploaded'}"
-                                                class="px-4 py-1.5 rounded-lg text-xs font-bold transition">
-                                            Uploaded ({{ $uploadedCount }})
+                                                class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition">
+                                            <i class="fas fa-check text-[8px] mr-0.5"></i>Done ({{ $uploadedCount }})
                                         </button>
                                         <button @click="activeTab = 'pending'"
                                                 :class="{'bg-white text-red-700 shadow-sm': activeTab === 'pending', 'text-gray-500 hover:text-gray-850': activeTab !== 'pending'}"
-                                                class="px-4 py-1.5 rounded-lg text-xs font-bold transition">
-                                            Pending ({{ 30 - $uploadedCount }})
+                                                class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition">
+                                            <i class="fas fa-clock text-[8px] mr-0.5"></i>Pending ({{ 30 - $uploadedCount }})
                                         </button>
                                     </div>
 
                                     <!-- Search Requirements Box -->
-                                    <div class="relative w-full md:w-64">
-                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                                            <i class="fas fa-search text-xs"></i>
+                                    <div class="relative w-full">
+                                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-gray-400">
+                                            <i class="fas fa-search text-[10px]"></i>
                                         </span>
                                         <input type="text" x-model="searchQuery" placeholder="Search requirements..."
-                                               class="pl-9 pr-4 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-xs py-2">
+                                               class="pl-8 pr-3 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-[11px] py-1.5">
                                     </div>
                                 </div>
 
-                                <!-- Documents Checklist Table -->
+                                <!-- Documents Checklist List -->
                                 @if(isset($documentsByFamilyMember[$familyMember->id]))
-                                    <div class="overflow-x-auto rounded-xl border border-gray-200">
-                                        <table class="min-w-full divide-y divide-gray-200 text-left text-xs">
-                                            <thead class="bg-gray-50">
-                                                <tr>
-                                                    <th class="px-4 py-3 text-gray-500 font-bold uppercase tracking-wider w-16 text-center">No.</th>
-                                                    <th class="px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Required Document Name</th>
-                                                    <th class="px-4 py-3 text-gray-500 font-bold uppercase tracking-wider">Upload / Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="divide-y divide-gray-150">
-                                                @foreach(range(1, 30) as $documentNumber)
-                                                    @php
-                                                        $document = $documentsByFamilyMember[$familyMember->id]['documents']
-                                                                    ->where('document_number', $documentNumber)->first();
-                                                        $hasDoc = $document && $document->document_name;
-                                                        $docName = $documentNames[$documentNumber - 1] ?? 'Document Checklist Item ' . $documentNumber;
-                                                    @endphp
-                                                    
-                                                    <!-- Row with filtering hooks (X-Show logic mapped dynamically) -->
-                                                    <tr x-show="(activeTab === 'all' || (activeTab === 'uploaded' && {{ $hasDoc ? 'true' : 'false' }}) || (activeTab === 'pending' && {{ $hasDoc ? 'false' : 'true' }})) && ('{{ strtolower($docName) }}'.includes(searchQuery.toLowerCase()))"
-                                                        class="transition {{ $hasDoc ? 'bg-green-50/20 hover:bg-green-50/40' : 'hover:bg-gray-50/50' }}">
-                                                        
-                                                        <td class="px-4 py-3.5 text-center font-bold text-gray-400 bg-gray-50/40">
+                                    <div class="rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100">
+
+                                        {{-- Header row (desktop only) --}}
+                                        <div class="hidden sm:flex items-center bg-gray-50 px-3 py-2 gap-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                            <span class="w-7 text-center flex-shrink-0">#</span>
+                                            <span class="flex-1">Document Name</span>
+                                            <span class="w-52 flex-shrink-0">File</span>
+                                            <span class="w-20 flex-shrink-0 text-center">Action</span>
+                                        </div>
+
+                                        @foreach(range(1, 30) as $documentNumber)
+                                            @php
+                                                $document = $documentsByFamilyMember[$familyMember->id]['documents']
+                                                            ->where('document_number', $documentNumber)->first();
+                                                $hasDoc = $document && $document->document_name;
+                                                $docName = $documentNames[$documentNumber - 1] ?? 'Document Checklist Item ' . $documentNumber;
+                                            @endphp
+
+                                            <div x-show="(activeTab === 'all' || (activeTab === 'uploaded' && {{ $hasDoc ? 'true' : 'false' }}) || (activeTab === 'pending' && {{ $hasDoc ? 'false' : 'true' }})) && ('{{ strtolower($docName) }}'.includes(searchQuery.toLowerCase()))"
+                                                 class="transition {{ $hasDoc ? 'bg-green-50/30 hover:bg-green-50/50' : 'bg-white hover:bg-gray-50/60' }}">
+
+                                                @if($hasDoc)
+                                                    {{-- ── UPLOADED STATE ──────────────────────────────────── --}}
+                                                    <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 px-3 py-2.5">
+                                                        {{-- Number --}}
+                                                        <span class="flex-shrink-0 h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-green-100 text-green-700 text-[10px] font-extrabold flex items-center justify-center border border-green-200">
                                                             {{ $documentNumber }}
-                                                        </td>
-                                                        <td class="px-4 py-3.5 font-semibold text-gray-700 leading-tight">
+                                                        </span>
+                                                        {{-- Doc Name --}}
+                                                        <span class="flex-1 min-w-0 text-xs sm:text-sm font-semibold text-gray-800 leading-snug">
                                                             {{ $docName }}
-                                                        </td>
-                                                        <td class="px-4 py-3.5 whitespace-nowrap font-medium text-gray-700">
-                                                            @if($hasDoc)
-                                                                <div class="flex items-center space-x-2">
-                                                                    <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-green-150 text-green-700 border border-green-300">
-                                                                        <i class="fas fa-check text-xs"></i>
-                                                                    </span>
-                                                                    <span class="text-xs text-green-700 font-bold uppercase tracking-wider">Uploaded</span>
-                                                                    <a href="{{ route('view.pdf', ['fileName' => $document->document_name]) }}"
-                                                                       target="_blank"
-                                                                       class="inline-flex items-center text-xs font-bold text-[#0e1e3a] hover:text-[#ef3b45] hover:underline ml-3">
-                                                                        <i class="fas fa-external-link-alt mr-1"></i> View Document
-                                                                    </a>
-                                                                </div>
-                                                            @else
-                                                                <div class="flex items-center space-x-2">
-                                                                    <form class="upload-form flex items-center space-x-2" enctype="multipart/form-data">
-                                                                        @csrf
+                                                        </span>
+                                                        {{-- Status + View --}}
+                                                        <div class="flex items-center gap-2 flex-shrink-0 ml-auto sm:ml-0">
+                                                            <span class="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-200 px-2 py-1 rounded-lg text-[10px] font-bold">
+                                                                <i class="fas fa-check-circle text-[9px]"></i> Uploaded
+                                                            </span>
+                                                            <a href="{{ route('view.pdf', ['fileName' => $document->document_name]) }}"
+                                                               target="_blank"
+                                                               class="inline-flex items-center gap-1 bg-[#0e1e3a] hover:bg-[#1a3461] text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-sm">
+                                                                <i class="fas fa-eye text-[9px]"></i>
+                                                                <span class="hidden sm:inline">View</span>
+                                                                <span class="sm:hidden">View</span>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+
+                                                @else
+                                                    {{-- ── UPLOAD FORM ─────────────────────────────────────── --}}
+                                                    <div class="px-3 py-2.5">
+
+                                                        {{-- Mobile: doc name on top --}}
+                                                        <div class="flex items-center gap-2 mb-2 sm:hidden">
+                                                            <span class="flex-shrink-0 h-6 w-6 rounded-full bg-gray-100 text-gray-500 text-[10px] font-extrabold flex items-center justify-center border border-gray-200">
+                                                                {{ $documentNumber }}
+                                                            </span>
+                                                            <span class="text-xs font-semibold text-gray-800 leading-snug">{{ $docName }}</span>
+                                                        </div>
+
+                                                        {{-- Desktop + Mobile controls row --}}
+                                                        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3">
+
+                                                            {{-- Desktop: number badge --}}
+                                                            <span class="hidden sm:flex flex-shrink-0 h-7 w-7 rounded-full bg-gray-100 text-gray-400 text-[10px] font-extrabold items-center justify-center border border-gray-200">
+                                                                {{ $documentNumber }}
+                                                            </span>
+
+                                                            {{-- Desktop: doc name --}}
+                                                            <span class="hidden sm:block flex-1 min-w-0 text-sm font-semibold text-gray-800 leading-snug">
+                                                                {{ $docName }}
+                                                            </span>
+
+                                                            {{-- Upload form (visible on both) --}}
+                                                            <div class="flex-1 sm:flex-none sm:w-52 min-w-0 w-full">
+                                                                <form class="upload-form flex items-center gap-2" enctype="multipart/form-data">
+                                                                    @csrf
+                                                                    <input type="hidden" name="family_member_id" value="{{ $familyMember->id }}">
+                                                                    <input type="hidden" name="document_number" value="{{ $documentNumber }}">
+
+                                                                    {{-- File picker --}}
+                                                                    <div class="upload-dropzone relative flex-1 flex items-center border border-dashed border-gray-300 bg-gray-50 rounded-lg px-2.5 py-1.5 hover:border-[#ef3b45] hover:bg-red-50/20 transition group cursor-pointer overflow-hidden">
+                                                                        <i class="fas fa-file-pdf text-gray-300 group-hover:text-[#ef3b45] text-sm mr-1.5 flex-shrink-0 transition-colors"></i>
+                                                                        <div class="flex-1 min-w-0">
+                                                                            <p class="upload-placeholder text-[10px] font-semibold text-gray-400 group-hover:text-[#ef3b45] transition-colors truncate">Choose PDF</p>
+                                                                            <p class="upload-selected-name text-[10px] font-bold text-[#ef3b45] hidden truncate"></p>
+                                                                        </div>
                                                                         <input type="file" name="document" required accept="application/pdf"
-                                                                               class="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-[#ef3b45] hover:file:bg-red-100 transition cursor-pointer" />
-                                                                        
-                                                                        <input type="hidden" name="family_member_id" value="{{ $familyMember->id }}">
-                                                                        <input type="hidden" name="document_number" value="{{ $documentNumber }}">
-                                                                        
-                                                                        <button type="submit" class="px-3 py-1 bg-[#ef3b45] hover:bg-[#d12e37] text-white text-xs font-bold rounded-xl transition flex items-center shadow-sm">
-                                                                            <i class="fas fa-cloud-upload-alt mr-1"></i> Upload
-                                                                        </button>
-                                                                    </form>
-                                                                    <div class="uploadStatusDiv hidden flex items-center space-x-2">
-                                                                        <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-green-150 text-green-700 border border-green-300">
-                                                                            <i class="fas fa-check text-xs"></i>
-                                                                        </span>
-                                                                        <span class="text-xs text-green-700 font-bold uppercase tracking-wider">Uploaded</span>
+                                                                               class="upload-file-input absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                                                                     </div>
-                                                                </div>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
+
+                                                                    {{-- Upload button --}}
+                                                                    <button type="submit"
+                                                                            class="upload-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#ef3b45] hover:bg-[#d12e37] active:bg-[#b22530] text-white text-[10px] font-bold rounded-lg transition shadow-sm whitespace-nowrap">
+                                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                                        <span class="upload-btn-text">Upload</span>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+
+                                                            {{-- Post-upload success indicator --}}
+                                                            <div class="uploadStatusDiv hidden flex items-center gap-1.5 mt-1 sm:mt-0">
+                                                                <span class="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-200 px-2 py-1 rounded-lg text-[10px] font-bold">
+                                                                    <i class="fas fa-check-circle text-[9px]"></i> Uploaded
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                @endif
+
+                                            </div>
+                                        @endforeach
+
                                     </div>
                                 @else
                                     <p class="text-xs text-gray-500 italic p-4 text-center">No document records initialized for this member.</p>
@@ -254,17 +299,46 @@
     </div>
 
     <script>
+    // ─── Filename preview inside dropzone card ──────────────────────────────────
+    document.querySelectorAll('.upload-file-input').forEach(function(input) {
+        const dropzone  = input.closest('.upload-dropzone');
+        const form      = input.closest('.upload-form');
+        if (!dropzone || !form) return;
+
+        const placeholder = dropzone.querySelector('.upload-placeholder');
+        const selected    = dropzone.querySelector('.upload-selected-name');
+
+        input.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const fileName = this.files[0].name;
+                if (placeholder) placeholder.classList.add('hidden');
+                if (selected)    { selected.textContent = fileName; selected.classList.remove('hidden'); }
+                dropzone.classList.add('border-[#ef3b45]', 'bg-red-50');
+                dropzone.classList.remove('border-gray-300', 'bg-gray-50');
+            } else {
+                if (placeholder) placeholder.classList.remove('hidden');
+                if (selected)    { selected.textContent = ''; selected.classList.add('hidden'); }
+                dropzone.classList.remove('border-[#ef3b45]', 'bg-red-50');
+                dropzone.classList.add('border-gray-300', 'bg-gray-50');
+            }
+        });
+    });
+
+    // ─── Upload form submit handler ─────────────────────────────────────────────
     document.querySelectorAll('.upload-form').forEach(form => {
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
+            e.preventDefault();
 
-            const formData = new FormData(form);
+            const formData  = new FormData(form);
             const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnHtml = submitBtn.innerHTML;
-            
-            // Show upload loading indicator
+            const btnText   = submitBtn.querySelector('.upload-btn-text');
+            const btnIcon   = submitBtn.querySelector('i');
+
+            // Show loading state
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...';
+            submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            if (btnIcon)  btnIcon.className = 'fas fa-spinner fa-spin';
+            if (btnText)  btnText.textContent = 'Uploading...';
 
             try {
                 const response = await fetch('{{ route("upload.document") }}', {
@@ -276,30 +350,29 @@
                     const responseData = await response.json();
                     handleSuccess(responseData.message, form);
                 } else {
-                    handleError(submitBtn, originalBtnHtml);
+                    handleError(submitBtn, btnText, btnIcon);
                 }
             } catch (error) {
                 console.error('Error occurred during document upload:', error);
-                handleError(submitBtn, originalBtnHtml);
+                handleError(submitBtn, btnText, btnIcon);
             }
         });
     });
 
     function handleSuccess(message, form) {
-        // Hide the form
+        // Hide the form wrapper and show the uploaded status indicator
+        const wrapper   = form.closest('.w-full');
+        const statusDiv = wrapper ? wrapper.querySelector('.uploadStatusDiv') : form.nextElementSibling;
         form.style.display = 'none';
-        // Show success indicator relative to the sibling container
-        const statusDiv = form.nextElementSibling;
-        if (statusDiv) {
-            statusDiv.classList.remove('hidden');
-        }
-        // Display success toast message
+        if (statusDiv) statusDiv.classList.remove('hidden');
         showSuccessToast(message);
     }
 
-    function handleError(submitBtn, originalBtnHtml) {
+    function handleError(submitBtn, btnText, btnIcon) {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnHtml;
+        submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+        if (btnIcon)  btnIcon.className = 'fas fa-cloud-upload-alt';
+        if (btnText)  btnText.textContent = 'Upload';
         alert('An error occurred during document upload. Please try again.');
     }
 
@@ -312,9 +385,7 @@
 
     function hideToastWithAnimation() {
         var toast = document.querySelector('.alert-toast');
-        if (toast) {
-            $(toast).fadeOut(300);
-        }
+        if (toast) $(toast).fadeOut(300);
     }
     </script>
 </x-app-layout>

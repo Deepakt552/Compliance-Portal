@@ -173,8 +173,8 @@
                      x-transition:leave="transition ease-in duration-75"
                      x-transition:leave-start="opacity-100 scale-100"
                      x-transition:leave-end="opacity-0 scale-95"
-                     class="absolute right-0 mt-3 w-80 bg-white border border-gray-150 rounded-2xl shadow-xl z-50 overflow-hidden"
-                     style="display: none;">
+                     class="absolute right-0 mt-3 bg-white border border-gray-150 rounded-2xl shadow-xl z-50 overflow-hidden"
+                     style="display: none; width: min(320px, calc(100vw - 1.5rem));">
                     
                     <div class="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
                         <span class="text-sm font-bold text-[#0e1e3a]">Notifications</span>

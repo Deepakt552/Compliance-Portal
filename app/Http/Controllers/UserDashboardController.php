@@ -208,5 +208,36 @@ if ($property) {
             return redirect()->back()->with('error', 'An error occurred during the document re-upload. Please try again.');
         }
     }
-    
+
+    public function getRejectedDocuments()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['count' => 0, 'documents' => []]);
+        }
+
+        $familyMembers = HouseholdData::where('userId', $user->UserId)->get();
+        $rejected = [];
+
+        foreach ($familyMembers as $member) {
+            $docs = Document::where('family_member_id', $member->id)
+                            ->where('status', 'rejected')
+                            ->get();
+            foreach ($docs as $doc) {
+                $docName = Document::$documentNames[$doc->document_number - 1] ?? 'Document #' . $doc->document_number;
+                $rejected[] = [
+                    'member'     => $member->firstName . ' ' . $member->lastName,
+                    'document'   => $docName,
+                    'comments'   => $doc->comments ?? '',
+                    'updated_at' => $doc->updated_at ? $doc->updated_at->diffForHumans() : '',
+                ];
+            }
+        }
+
+        return response()->json([
+            'count'     => count($rejected),
+            'documents' => $rejected,
+        ]);
+    }
 }

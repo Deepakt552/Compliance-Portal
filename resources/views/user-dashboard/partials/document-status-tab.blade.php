@@ -1,100 +1,141 @@
-<div class="mt-2">
-    <div class="overflow-x-auto rounded-xl border border-gray-150">
-        <table class="min-w-full divide-y divide-gray-200 text-left text-xs">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-gray-500 font-bold uppercase tracking-wider">Family Member</th>
-                    <th class="px-6 py-3 text-gray-500 font-bold uppercase tracking-wider w-1/3">Document Name</th>
-                    <th class="px-6 py-3 text-gray-500 font-bold uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-right text-gray-500 font-bold uppercase tracking-wider">Operations</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-150">
-                @php $hasDocuments = false; @endphp
-                @foreach($familyMembers as $familyMember)
+<div class="mt-2 space-y-4">
+    @php $hasDocuments = false; @endphp
+
+    @foreach($familyMembers as $familyMember)
+        @php
+            $documents = $documentsByFamilyMember[$familyMember->id]['documents']->where('status', $status);
+        @endphp
+
+        @if($documents->isNotEmpty())
+            @php $hasDocuments = true; @endphp
+
+            {{-- Family Member Group Label --}}
+            <div class="flex items-center space-x-2.5 pt-2 pb-1 px-1">
+                <div class="h-8 w-8 rounded-full bg-[#0e1e3a] text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                    {{ strtoupper(substr($familyMember->firstName, 0, 1) . substr($familyMember->lastName, 0, 1)) }}
+                </div>
+                <div>
+                    <p class="font-bold text-[#0e1e3a] text-sm leading-none">{{ $familyMember->firstName }} {{ $familyMember->lastName }}</p>
+                    <span class="text-[9px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded border border-indigo-100 uppercase tracking-wide mt-0.5 inline-block">{{ $familyMember->Relation }}</span>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100">
+                @foreach($documents as $document)
                     @php
-                        $documents = $documentsByFamilyMember[$familyMember->id]['documents']->where('status', $status);
+                        $docName = App\Models\Document::$documentNames[$document->document_number - 1] ?? 'Document #' . $document->document_number;
                     @endphp
-                    @if($documents->isNotEmpty())
-                        @php $hasDocuments = true; @endphp
-                        @foreach($documents as $document)
-                            <tr class="hover:bg-gray-50/50 transition">
-                                <!-- Family Member -->
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-2.5">
-                                        <div class="h-7 w-7 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[#0e1e3a] text-[10px]">
-                                            {{ strtoupper(substr($familyMember->firstName, 0, 1) . substr($familyMember->lastName, 0, 1)) }}
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-gray-900 leading-none">{{ $familyMember->firstName }} {{ $familyMember->lastName }}</p>
-                                            <span class="text-[9px] bg-indigo-50 text-indigo-700 font-bold px-1.5 py-0.5 rounded border border-indigo-100 uppercase tracking-wide mt-1 inline-block">{{ $familyMember->Relation }}</span>
-                                        </div>
+
+                    <div class="p-4 @if($document->status === 'rejected') bg-red-50/30 @elseif($document->status === 'verified') bg-green-50/20 @else bg-yellow-50/20 @endif">
+                        {{-- Top Row: Doc name + status badge --}}
+                        <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-gray-800 leading-snug">{{ $docName }}</p>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Document #{{ $document->document_number }}</p>
+                            </div>
+                            <span class="px-2.5 py-1 inline-flex items-center rounded-full text-[10px] font-bold border uppercase flex-shrink-0
+                                @if($document->status === 'verified') bg-green-50 text-green-700 border-green-200
+                                @elseif($document->status === 'rejected') bg-red-50 text-red-700 border-red-200
+                                @else bg-yellow-50 text-yellow-700 border-yellow-200 @endif">
+                                <i class="fas @if($document->status === 'verified') fa-check-circle @elseif($document->status === 'rejected') fa-times-circle @else fa-hourglass-half @endif mr-1"></i>
+                                {{ $document->status === 'verified' ? 'Approved' : ($document->status === 'rejected' ? 'Rejected' : 'Pending Verification') }}
+                            </span>
+                        </div>
+
+                        {{-- Rejection Feedback Box --}}
+                        @if($document->status === 'rejected' && $document->comments)
+                            <div class="mb-3 p-3 bg-red-50 border border-red-200 rounded-xl text-[11px] text-red-800 leading-relaxed">
+                                <div class="flex items-start space-x-2">
+                                    <i class="fas fa-exclamation-circle text-red-500 mt-0.5 flex-shrink-0"></i>
+                                    <div>
+                                        <strong class="font-bold text-red-900 block mb-0.5">Admin Feedback:</strong>
+                                        {{ $document->comments }}
                                     </div>
-                                </td>
+                                </div>
+                            </div>
+                        @endif
 
-                                <!-- Document Name -->
-                                <td class="px-6 py-4 text-gray-700 font-medium leading-relaxed">
-                                    {{ App\Models\Document::$documentNames[$document->document_number - 1] ?? 'Document #' . $document->document_number }}
-                                </td>
+                        {{-- Actions Row --}}
+                        <div class="flex flex-wrap items-end gap-3">
+                            {{-- Re-upload form (only for rejected) --}}
+                            @if($document->status === 'rejected')
+                                <form method="post" action="{{ route('reupload.document') }}" enctype="multipart/form-data"
+                                      class="flex-1 min-w-0">
+                                    @csrf
+                                    <input type="hidden" name="family_member_id" value="{{ $document->family_member_id }}">
+                                    <input type="hidden" name="document_number" value="{{ $document->document_number }}">
+                                    <input type="hidden" name="document_id" value="{{ $document->id }}">
 
-                                <!-- Status Badge -->
-                                <td class="px-6 py-4">
-                                    <span class="px-2.5 py-1 inline-flex items-center rounded-full text-[10px] font-bold border uppercase
-                                        @if($document->status === 'verified') bg-green-50 text-green-700 border-green-200
-                                        @elseif($document->status === 'rejected') bg-red-50 text-red-700 border-red-200
-                                        @else bg-yellow-50 text-yellow-700 border-yellow-200 @endif">
-                                        <i class="fas @if($document->status === 'verified') fa-check-circle @elseif($document->status === 'rejected') fa-times-circle @else fa-hourglass-half @endif mr-1"></i>
-                                        {{ $document->status === 'verified' ? 'Approved' : ($document->status === 'rejected' ? 'Rejected' : 'Pending Verification') }}
-                                    </span>
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                                        <i class="fas fa-paperclip mr-1"></i> Select Replacement PDF
+                                    </label>
 
-                                    <!-- Rejected Comments -->
-                                    @if($document->status === 'rejected' && $document->comments)
-                                        <div class="mt-2 p-2 bg-red-50 border border-red-100 rounded-xl text-[10px] text-red-800 leading-snug">
-                                            <strong class="font-bold text-red-900 block mb-0.5">Feedback:</strong>
-                                            "{{ $document->comments }}"
+                                    {{-- Styled file input card --}}
+                                    <div class="relative flex items-center border-2 border-dashed border-red-300 bg-white rounded-xl px-4 py-3 hover:border-[#ef3b45] transition group cursor-pointer">
+                                        <i class="fas fa-file-pdf text-[#ef3b45] text-lg mr-3 group-hover:scale-110 transition-transform"></i>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-[10px] font-semibold text-gray-600">Click to choose a PDF file</p>
+                                            <p class="text-[9px] text-gray-400 mt-0.5">Max 10MB · PDF only</p>
                                         </div>
-                                    @endif
-                                </td>
+                                        <input type="file" name="document" required accept="application/pdf"
+                                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                        <span class="reupload-filename text-[10px] text-[#ef3b45] font-bold ml-2 truncate max-w-[120px] hidden"></span>
+                                    </div>
 
-                                <!-- Operations (ReUpload & View) -->
-                                <td class="px-6 py-4 text-right whitespace-nowrap space-y-2 sm:space-y-0 sm:space-x-2">
-                                    @if($document->status === 'rejected')
-                                        <!-- Re-upload Form -->
-                                        <form method="post" action="{{ route('reupload.document') }}" enctype="multipart/form-data" class="inline-flex items-center space-x-1">
-                                            @csrf
-                                            <input type="file" name="document" required accept="application/pdf"
-                                                   class="block w-40 text-[10px] text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-xl file:border-0 file:text-[10px] file:font-semibold file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100 transition cursor-pointer" />
-                                            <input type="hidden" name="family_member_id" value="{{ $document->family_member_id }}">
-                                            <input type="hidden" name="document_number" value="{{ $document->document_number }}">
-                                            <input type="hidden" name="document_id" value="{{ $document->id }}">
-                                            <button type="submit" class="bg-[#ef3b45] hover:bg-[#d12e37] text-white font-bold px-2.5 py-1 rounded-xl transition text-[10px] flex items-center shadow-sm">
-                                                <i class="fas fa-redo mr-1"></i> Re-Upload
-                                            </button>
-                                        </form>
-                                    @endif
+                                    <button type="submit"
+                                            class="mt-2 w-full sm:w-auto flex items-center justify-center space-x-2 bg-[#ef3b45] hover:bg-[#d12e37] active:bg-[#b22530] text-white font-bold px-4 py-2 rounded-xl transition text-xs shadow-sm">
+                                        <i class="fas fa-redo"></i>
+                                        <span>Submit Re-Upload</span>
+                                    </button>
+                                </form>
+                            @endif
 
-                                    @if($document->document_name)
-                                        <a href="{{ route('view.pdf', ['fileName' => $document->document_name]) }}" 
-                                           target="_blank" 
-                                           class="inline-flex items-center px-2.5 py-1 bg-[#0e1e3a] hover:bg-[#1a3461] text-white text-[10px] font-bold rounded-xl transition shadow-sm">
-                                            <i class="fas fa-eye mr-1"></i> View File
-                                        </a>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    @endif
+                            {{-- View File button --}}
+                            @if($document->document_name)
+                                <div class="flex-shrink-0 self-end">
+                                    <a href="{{ route('view.pdf', ['fileName' => $document->document_name]) }}"
+                                       target="_blank"
+                                       class="inline-flex items-center space-x-2 px-4 py-2 bg-[#0e1e3a] hover:bg-[#1a3461] text-white text-xs font-bold rounded-xl transition shadow-sm">
+                                        <i class="fas fa-eye"></i>
+                                        <span>View Current File</span>
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                 @endforeach
+            </div>
+        @endif
+    @endforeach
 
-                @if(!$hasDocuments)
-                    <tr>
-                        <td colspan="4" class="px-6 py-10 text-center text-gray-500">
-                            <i class="fas fa-folder-open text-3xl text-gray-300 mb-2 block"></i>
-                            No documents in this category.
-                        </td>
-                    </tr>
-                @endif
-            </tbody>
-        </table>
-    </div>
+    @if(!$hasDocuments)
+        <div class="py-12 text-center text-gray-500">
+            <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
+                <i class="fas fa-folder-open text-2xl text-gray-300"></i>
+            </div>
+            <p class="text-sm font-semibold text-gray-400">No documents in this category.</p>
+            <p class="text-xs text-gray-300 mt-1">Documents will appear here once processed.</p>
+        </div>
+    @endif
 </div>
+
+<script>
+// Show chosen filename in the styled file picker
+document.querySelectorAll('.reupload-filename').forEach(function(span) {
+    const container = span.closest('.relative');
+    if (!container) return;
+    const fileInput = container.querySelector('input[type="file"]');
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                span.textContent = this.files[0].name;
+                span.classList.remove('hidden');
+                container.classList.add('border-[#ef3b45]', 'bg-red-50/30');
+            } else {
+                span.textContent = '';
+                span.classList.add('hidden');
+            }
+        });
+    }
+});
+</script>

@@ -56,7 +56,7 @@
                          x-transition:leave="transition ease-in duration-75"
                          x-transition:leave-start="opacity-100 scale-100"
                          x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute right-0 mt-3 w-72 bg-white text-gray-900 border border-gray-150 rounded-2xl shadow-xl z-50 overflow-hidden"
+                         class="absolute right-0 mt-3 w-72 bg-white text-gray-900 border border-gray-150 rounded-2xl shadow-xl z-50 overflow-hidden" style="max-width: min(288px, calc(100vw - 2rem));"
                          style="display: none;">
                         
                         <div class="px-4 py-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
@@ -139,9 +139,68 @@
                 </div>
             </div>
 
-            <!-- Hamburger (Mobile View Toggle Button) -->
-            <div class="-mr-2 flex items-center sm:hidden">
-                <button @click="open = !open" 
+            <!-- Mobile Right Controls: Bell + Hamburger -->
+            <div class="flex items-center space-x-1 sm:hidden">
+
+                <!-- Mobile Bell Icon -->
+                <div class="relative" x-data="{ mobileNotifOpen: false }">
+                    <button @click="mobileNotifOpen = !mobileNotifOpen" @click.away="mobileNotifOpen = false"
+                            class="p-2 rounded-xl text-gray-300 hover:text-[#ef3b45] hover:bg-white hover:bg-opacity-5 transition focus:outline-none relative">
+                        <i class="fas fa-bell text-base"></i>
+                        @if($notificationCount > 0)
+                            <span class="absolute top-1 right-1 h-4 w-4 bg-[#ef3b45] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                {{ $notificationCount }}
+                            </span>
+                        @endif
+                    </button>
+
+                    <!-- Mobile Notification Dropdown -->
+                    <div x-show="mobileNotifOpen"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute right-0 mt-3 bg-white text-gray-900 border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden"
+                         style="display:none; width: calc(100vw - 2rem); max-width: 320px;">
+
+                        <div class="px-4 py-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                            <span class="text-xs font-bold text-[#0e1e3a] uppercase">Notifications</span>
+                            <span class="text-[10px] bg-red-50 text-[#ef3b45] font-bold px-2 py-0.5 rounded-full border border-red-100">{{ $notificationCount }} Alert</span>
+                        </div>
+                        <div class="max-h-56 overflow-y-auto divide-y divide-gray-100">
+                            @php $limitedMobile = $notifications->reverse()->take(8); @endphp
+                            @forelse ($limitedMobile as $notification)
+                                @if ($notification->role == 'Admin')
+                                    @php
+                                        $documentNameM = \App\Models\Document::getDocumentName($notification->message);
+                                        $isApprovedM   = $notification->status == 'approved';
+                                    @endphp
+                                    <div class="p-3 hover:bg-gray-50 transition">
+                                        <p class="text-xs font-semibold text-gray-800 leading-snug">
+                                            {{ $documentNameM }} has been
+                                            <span class="{{ $isApprovedM ? 'text-green-600' : 'text-red-500' }} font-bold">
+                                                {{ $notification->status }}
+                                            </span>
+                                        </p>
+                                        <span class="text-[9px] text-gray-400 mt-1 block">
+                                            <i class="far fa-clock mr-1"></i>{{ $notification->created_at->diffForHumans() }}
+                                        </span>
+                                    </div>
+                                @endif
+                            @empty
+                                <div class="p-4 text-center text-xs text-gray-500">
+                                    <i class="far fa-bell-slash text-lg text-gray-300 mb-1.5 block"></i>
+                                    No notifications found.
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hamburger Button -->
+                <button @click="open = !open"
                         class="inline-flex items-center justify-center p-2 rounded-xl text-gray-300 hover:text-white hover:bg-white hover:bg-opacity-5 focus:outline-none transition">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />

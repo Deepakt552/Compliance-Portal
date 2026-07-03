@@ -96,6 +96,7 @@ Route::get('/household/search', [HouseholdController::class, 'search'])->name('h
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
     Route::post('/upload-document', [UserDashboardController::class, 'uploadDocument'])->name('upload.document');
+    Route::get('/user/rejected-documents', [UserDashboardController::class, 'getRejectedDocuments'])->name('user.rejected.documents');
 });
 Route::post('/reupload-document', [UserDashboardController::class, 'reuploadDocument'])->name('reupload.document');
 
