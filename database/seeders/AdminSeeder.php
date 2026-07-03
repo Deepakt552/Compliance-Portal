@@ -13,12 +13,14 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        Admin::create([
-            'name'     => 'Admin',
-            'email'    => 'admin@navkarservices.com',
-            'password' => 'admin@123',
-        ]);
+        Admin::updateOrCreate(
+            ['email' => 'itdev@navkarservices.com'],
+            [
+                'name'     => 'deepak tiwari',
+                'password' => Hash::make('12345678'),
+            ]
+        );
 
-        $this->command->info('Admin user seeded successfully in admins table.');
+        $this->command->info('Admin user deepak tiwari seeded successfully in admins table.');
     }
 }
