@@ -100,15 +100,15 @@
                                         @if($document->status === 'pending')
                                             <div class="flex flex-wrap items-center gap-3">
                                                 <!-- Approve form -->
-                                                <form method="post" action="{{ route('admin.approveDocument', ['documentId' => $document->id]) }}" class="inline">
+                                                <form method="post" action="{{ route('admin.approveDocument', ['documentId' => $document->id]) }}" class="inline approval-rejection-form">
                                                     @csrf
-                                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center">
-                                                        <i class="fas fa-check-circle mr-1.5"></i> Approve
+                                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center submit-btn">
+                                                        <i class="fas fa-check-circle mr-1.5 icon-state"></i> <span class="text-state">Approve</span>
                                                     </button>
                                                 </form>
-
+ 
                                                 <!-- Reject form -->
-                                                <form method="post" action="{{ route('admin.rejectDocument', ['documentId' => $document->id]) }}" class="inline-flex items-center gap-1.5">
+                                                <form method="post" action="{{ route('admin.rejectDocument', ['documentId' => $document->id]) }}" class="inline-flex items-center gap-1.5 approval-rejection-form">
                                                     @csrf
                                                     <div class="relative">
                                                         <input type="text" name="comments" placeholder="Reason for rejection" required
@@ -122,8 +122,8 @@
                                                             <option value="Missing pages or signatures.">
                                                         </datalist>
                                                     </div>
-                                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center">
-                                                        <i class="fas fa-times-circle mr-1.5"></i> Reject
+                                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center submit-btn">
+                                                        <i class="fas fa-times-circle mr-1.5 icon-state"></i> <span class="text-state">Reject</span>
                                                     </button>
                                                 </form>
                                             </div>
@@ -165,4 +165,36 @@
             @endif
         </div>
     </div>
+
+    <!-- Script to disable buttons and show loading states during document approval/rejection -->
+    <script>
+        document.querySelectorAll('.approval-rejection-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                // Find all buttons in the parent cell and disable them to prevent multiple requests
+                const parentCell = form.closest('td');
+                if (parentCell) {
+                    parentCell.querySelectorAll('.submit-btn').forEach(btn => {
+                        btn.disabled = true;
+                        btn.style.opacity = '0.6';
+                        btn.style.cursor = 'not-allowed';
+                    });
+                }
+
+                // Change active button text to "Approving..." or "Rejecting..."
+                const submitBtn = form.querySelector('.submit-btn');
+                if (submitBtn) {
+                    const isApprove = submitBtn.classList.contains('bg-green-600');
+                    const textSpan = submitBtn.querySelector('.text-state');
+                    const iconState = submitBtn.querySelector('.icon-state');
+                    
+                    if (textSpan) {
+                        textSpan.textContent = isApprove ? 'Approving...' : 'Rejecting...';
+                    }
+                    if (iconState) {
+                        iconState.className = 'fas fa-spinner fa-spin mr-1.5 icon-state';
+                    }
+                }
+            });
+        });
+    </script>
 </x-admin-layout>
