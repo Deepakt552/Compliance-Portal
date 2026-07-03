@@ -21,6 +21,15 @@ class HouseholdDataImport implements ToModel, WithHeadingRow, WithBatchInserts, 
             return null;
         }
 
+        // Skip duplicates (firstName, lastName, and Code same as another)
+        $exists = HouseholdData::where('firstName', $row['firstname'] ?? null)
+            ->where('lastName', $row['lastname'] ?? null)
+            ->where('Code', $row['code'] ?? null)
+            ->exists();
+        if ($exists) {
+            return null;
+        }
+
         return new HouseholdData([
             'UnitNo'              => $row['unitno'] ?? null,
             'userId'              => $row['userid'] ?? null,

@@ -89,6 +89,15 @@ class HouseholdController extends Controller
             'Code' => 'required',
         ]);
 
+        $exists = HouseholdData::where('firstName', $request->firstName)
+            ->where('lastName', $request->lastName)
+            ->where('Code', $request->Code)
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()->withInput()->withErrors(['error' => 'A family member with this name and property code already exists in the database.']);
+        }
+
         HouseholdData::create($request->all());
 
         return redirect()->route('household.index')->with('success', 'Household data created successfully.');
@@ -121,6 +130,16 @@ class HouseholdController extends Controller
         ]);
 
         $householdData = HouseholdData::findOrFail($id);
+
+        $exists = HouseholdData::where('firstName', $request->firstName)
+            ->where('lastName', $request->lastName)
+            ->where('Code', $request->Code)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()->withInput()->withErrors(['error' => 'A family member with this name and property code already exists in the database.']);
+        }
         
         $householdData->update($request->all());
 
@@ -133,5 +152,80 @@ class HouseholdController extends Controller
 
         return redirect()->route('household.index')->with('success', 'Household data deleted successfully.');
     }
-    
+
+    public function importHouseholdRow(Request $request)
+    {
+        $rowData = $request->input('row');
+        if (!$rowData) {
+            return response()->json(['success' => false, 'error' => 'No data.'], 400);
+        }
+
+        $row = [];
+        foreach ($rowData as $key => $value) {
+            $normalizedKey = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $key));
+            $row[$normalizedKey] = $value;
+        }
+
+        $firstName = $row['firstname'] ?? null;
+        $lastName = $row['lastname'] ?? null;
+        $code = $row['code'] ?? null;
+
+        if (empty($firstName) || empty($lastName) || empty($code)) {
+            return response()->json(['success' => false, 'error' => 'Missing Name or Property Code.'], 422);
+        }
+
+        // Check duplicate
+        if (HouseholdData::where('firstName', $firstName)->where('lastName', $lastName)->where('Code', $code)->exists()) {
+            return response()->json(['success' => false, 'error' => "Member '$firstName $lastName' with property code '$code' already exists."], 422);
+        }
+
+        // Parse dates
+        $certificationDate = $this->parseImportDate($row['certificationdate'] ?? null);
+        $recertificationDate = $this->parseImportDate($row['recertificationdate'] ?? null);
+        $dob = $this->parseImportDate($row['dob'] ?? null);
+
+        try {
+            $member = HouseholdData::create([
+                'UnitNo'              => $row['unitno'] ?? null,
+                'userId'              => $row['userid'] ?? null,
+                'firstName'           => $firstName,
+                'lastName'            => $lastName,
+                'Age'                 => $row['age'] ?? null,
+                'AdultOrMinor'        => $row['adultminor'] ?? null,
+                'Relation'            => $row['relation'] ?? null,
+                'Student'             => $row['student'] ?? null,
+                'FamilySize'          => $row['familysize'] ?? null,
+                'CertificationDate'   => $certificationDate,
+                'RecertificationDate' => $recertificationDate,
+                'dob'                 => $dob,
+                'Code'                => $code,
+                'gender'              => $row['gender'] ?? null,
+            ]);
+
+            return response()->json(['success' => true, 'message' => "Member '{$member->firstName} {$member->lastName}' imported."]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    private function parseImportDate($date)
+    {
+        if (empty($date)) {
+            return null;
+        }
+
+        if (is_numeric($date)) {
+            try {
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($date)->format('Y-m-d');
+            } catch (\Exception $e) {
+                // fallback
+            }
+        }
+
+        try {
+            return \Carbon\Carbon::parse($date)->format('Y-m-d');
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

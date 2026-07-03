@@ -68,12 +68,14 @@ Route::post('/import/row', [ImportUserController::class, 'importRow'])->name('im
 //properties import
 Route::get('/property/import', [PropertyController::class, 'importPropertiesForm'])->name('property.import.form');
 Route::post('/property/import', [PropertyController::class, 'importProperties'])->name('property.import');
+Route::post('/property/import/row', [PropertyController::class, 'importPropertyRow'])->name('property.import.row');
 Route::resource('/properties', PropertyController::class);
 
 // HouseholdController
 
 Route::get('/household/import-form', [HouseholdController::class, 'importForm'])->name('household.import.form');
 Route::post('/household/import', [HouseholdController::class, 'import'])->name('household.import');
+Route::post('/household/import/row', [HouseholdController::class, 'importHouseholdRow'])->name('household.import.row');
 
 Route::get('/household', [HouseholdController::class, 'index'])->name('household.index');
 Route::get('/household/create', [HouseholdController::class, 'create'])->name('household.create');

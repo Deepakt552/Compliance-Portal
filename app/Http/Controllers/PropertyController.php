@@ -105,4 +105,43 @@ class PropertyController extends Controller
 
         return redirect()->route('properties.index')->with('success', 'Properties imported successfully.');
     }
+
+    public function importPropertyRow(\Illuminate\Http\Request $request)
+    {
+        $rowData = $request->input('row');
+        if (!$rowData) {
+            return response()->json(['success' => false, 'error' => 'No data.'], 400);
+        }
+
+        $row = [];
+        foreach ($rowData as $key => $value) {
+            $normalizedKey = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $key));
+            $row[$normalizedKey] = $value;
+        }
+
+        $code = $row['code'] ?? null;
+        if (empty($code)) {
+            return response()->json(['success' => false, 'error' => 'Missing Code.'], 422);
+        }
+
+        if (Properties::where('Code', $code)->exists()) {
+            return response()->json(['success' => false, 'error' => "Property code '$code' already exists."], 422);
+        }
+
+        try {
+            $property = Properties::create([
+                'Code'     => $code,
+                'Property' => $row['property'] ?? null,
+                'Address'  => $row['address'] ?? null,
+                'City'     => $row['city'] ?? null,
+                'Zip'      => $row['zip'] ?? null,
+                'State'    => $row['state'] ?? null,
+                'units'    => $row['units'] ?? null,
+            ]);
+
+            return response()->json(['success' => true, 'message' => "Property '{$property->Property}' imported."]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
 }
