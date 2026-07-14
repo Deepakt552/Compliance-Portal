@@ -47,7 +47,7 @@
                             <option value="">All Properties</option>
                             @foreach($codes as $code)
                                 @if(isset($propertyNames[$code]))
-                                    <option value="{{ $code }}" @if(request('code') == $code) selected @endif>
+                                    <option value="{{ trim($code) }}" @if(trim(request('code')) == trim($code)) selected @endif>
                                         {{ $propertyNames[$code] }}
                                     </option>
                                 @endif
@@ -192,7 +192,7 @@ function updateUnitNumbers() {
     var unitNoSelect = document.getElementById('unitNo');
     if (!codeEl || !unitNoSelect) return;
 
-    var selectedCode = codeEl.value;
+    var selectedCode = codeEl.value.trim().toUpperCase();
     var unitNumbers = @json($unitNumbers); 
 
     // Clear existing options

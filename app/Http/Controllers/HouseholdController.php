@@ -99,7 +99,10 @@ class HouseholdController extends Controller
         $unitNumbers = [];
 
         foreach ($unitNumbersByCode as $code => $units) {
-            $unitNumbers[$code] = $units->pluck('UnitNo')->unique()->toArray();
+            $trimmedCode = strtoupper(trim($code));
+            $unitNumbers[$trimmedCode] = $units->pluck('UnitNo')->map(function($val) {
+                return trim($val);
+            })->unique()->values()->toArray();
         }
 
         return $unitNumbers;
