@@ -195,6 +195,12 @@ function updateUnitNumbers() {
     var selectedCode = codeEl.value.trim().toUpperCase();
     var unitNumbers = @json($unitNumbers); 
 
+    console.log("Household Filter Debug:", {
+        selectedCode: selectedCode,
+        unitNumbers: unitNumbers,
+        matchedUnits: unitNumbers[selectedCode]
+    }); 
+
     // Clear existing options
     unitNoSelect.innerHTML = '';
 
