@@ -7,6 +7,10 @@
                 <p class="text-xs text-gray-400 mt-1">Create, update, and manage primary user portal accounts.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2.5">
+                <button type="button" id="bulk-delete-btn"
+                        class="hidden inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                    <i class="fas fa-trash-alt mr-1.5"></i> Delete Selected (<span id="selected-count">0</span>)
+                </button>
                 <a href="{{ route('users.create') }}"
                    class="inline-flex items-center px-4 py-2 bg-[#0e1e3a] hover:bg-[#1a3461] text-white text-xs font-bold rounded-xl transition shadow-sm">
                     <i class="fas fa-user-plus mr-1.5"></i> Create User
@@ -52,75 +56,97 @@
                     No users found matching your search.
                 </div>
             @else
+                <form id="bulk-delete-users-form" action="{{ route('users.bulkDestroy') }}" method="POST" class="hidden">
+                    @csrf
+                    @method('DELETE')
+                </form>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-left">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">User Account Name</th>
-                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Address</th>
-                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Property Status</th>
-                                <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-150">
-                            @foreach ($users as $user)
-                                <tr class="hover:bg-gray-50/50 transition">
-                                    <!-- Avatar & Name -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="h-9 w-9 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs uppercase">
-                                                {{ strtoupper(substr($user->FirstName ?? 'U', 0, 1) . substr($user->LastName ?? 'S', 0, 1)) }}
-                                            </div>
-                                            <div class="ml-3">
-                                                <div class="text-sm font-bold text-gray-900">{{ $user->FirstName }} {{ $user->LastName }}</div>
-                                                <div class="text-[10px] text-gray-400 font-medium">User ID: {{ $user->UserId ?? 'N/A' }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <!-- Email -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
-                                        {{ $user->email }}
-                                    </td>
-
-                                    <!-- Vacant Toggle -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <label class="inline-flex items-center cursor-pointer select-none">
-                                            <input type="checkbox" class="rounded border-gray-300 text-[#0e1e3a] focus:ring-[#0e1e3a] h-4.5 w-4.5 transition cursor-pointer"
-                                                   {{ $user->Vacant ? 'checked' : '' }}
-                                                   onchange="updateVacantStatus({{ $user->id }}, this)">
-                                            <span class="ml-2 text-xs font-semibold text-gray-700">Vacant Status</span>
-                                        </label>
-                                    </td>
-
-                                    <!-- Actions -->
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                                        <a href="{{ route('users.edit', $user->id) }}"
-                                           class="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
-                                            <i class="fas fa-edit mr-1"></i> Edit
-                                        </a>
-
-                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    onclick="return confirm('Are you sure you want to delete this user?')"
-                                                    class="inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-[#ef3b45] text-[#ef3b45] hover:text-white text-xs font-bold rounded-xl transition border border-red-100 hover:border-transparent">
-                                                <i class="fas fa-trash mr-1"></i> Delete
-                                            </button>
-                                        </form>
-                                    </td>
+                        <table class="min-w-full divide-y divide-gray-200 text-left">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider w-10">
+                                        <input type="checkbox" id="select-all-users" class="rounded border-gray-300 text-[#0e1e3a] focus:ring-[#0e1e3a] cursor-pointer">
+                                    </th>
+                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">User Account Name</th>
+                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Address</th>
+                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Property Status</th>
+                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Onboarding Status</th>
+                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-150">
+                                @foreach ($users as $user)
+                                    <tr class="hover:bg-gray-50/50 transition">
+                                        <!-- Checkbox -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="checkbox" name="ids[]" value="{{ $user->id }}" form="bulk-delete-users-form" class="user-checkbox rounded border-gray-300 text-[#0e1e3a] focus:ring-[#0e1e3a] cursor-pointer">
+                                        </td>
 
-                <!-- Pagination links -->
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-150">
-                    {{ $users->links() }}
-                </div>
-            @endif
+                                        <!-- Avatar & Name -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="h-9 w-9 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs uppercase">
+                                                    {{ strtoupper(substr($user->FirstName ?? 'U', 0, 1) . substr($user->LastName ?? 'S', 0, 1)) }}
+                                                </div>
+                                                <div class="ml-3">
+                                                    <div class="text-sm font-bold text-gray-900">{{ $user->FirstName }} {{ $user->LastName }}</div>
+                                                    <div class="text-[10px] text-gray-400 font-medium">User ID: {{ $user->UserId ?? 'N/A' }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <!-- Email -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
+                                            {{ $user->email }}
+                                        </td>
+
+                                        <!-- Vacant Toggle -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer select-none">
+                                                <input type="checkbox" class="rounded border-gray-300 text-[#0e1e3a] focus:ring-[#0e1e3a] h-4.5 w-4.5 transition cursor-pointer"
+                                                       {{ $user->Vacant ? 'checked' : '' }}
+                                                       onchange="updateVacantStatus({{ $user->id }}, this)">
+                                                <span class="ml-2 text-xs font-semibold text-gray-700">Vacant Status</span>
+                                            </label>
+                                        </td>
+
+                                        <!-- Onboarding Status -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if($user->ChangePwd && $user->ContactDetails)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">Active</span>
+                                            @else
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-50 text-gray-500 border border-gray-200" title="Pending password change or contact details update">Pending Onboarding</span>
+                                            @endif
+                                        </td>
+
+                                        <!-- Actions -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                                            <a href="{{ route('users.edit', $user->id) }}"
+                                               class="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                                                <i class="fas fa-edit mr-1"></i> Edit
+                                            </a>
+
+                                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline delete-user-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-[#ef3b45] text-[#ef3b45] hover:text-white text-xs font-bold rounded-xl transition border border-red-100 hover:border-transparent">
+                                                    <i class="fas fa-trash mr-1"></i> Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination links -->
+                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-150">
+                        {{ $users->links() }}
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </x-admin-layout>
@@ -156,5 +182,57 @@ function updateVacantStatus(userId, checkbox) {
         // If user cancels, revert checkbox state
         checkbox.checked = !checkbox.checked;
     }
+}
+
+function initDeleteModal() {
+    const selectAll = document.getElementById('select-all-users');
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+
+    // Hook bulk delete button to layout modal
+    if (bulkDeleteBtn) {
+        bulkDeleteBtn.addEventListener('click', function () {
+            const count = document.querySelectorAll('.user-checkbox:checked').length;
+            window.confirmDeleteModal.setForm(document.getElementById('bulk-delete-users-form'));
+            window.confirmDeleteModal.show(`Are you sure you want to delete the ${count} selected users?`);
+        });
+    }
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            toggleBulkButton();
+        });
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function () {
+            if (!this.checked && selectAll) {
+                selectAll.checked = false;
+            }
+            toggleBulkButton();
+        });
+    });
+
+    function toggleBulkButton() {
+        const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+        const selectedCountSpan = document.getElementById('selected-count');
+        if (selectedCountSpan) {
+            selectedCountSpan.textContent = checkedCount;
+        }
+        if (bulkDeleteBtn) {
+            if (checkedCount > 0) {
+                bulkDeleteBtn.classList.remove('hidden');
+            } else {
+                bulkDeleteBtn.classList.add('hidden');
+            }
+        }
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDeleteModal);
+} else {
+    initDeleteModal();
 }
 </script>

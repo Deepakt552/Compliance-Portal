@@ -50,7 +50,9 @@ class AdminDashboardController extends Controller
         $metrics = [
             'total_properties'   => Properties::count(),
             'total_users'        => User::count(),
+            'total_active_users' => User::where('ChangePwd', true)->where('ContactDetails', true)->count(),
             'total_households'   => HouseholdData::count(),
+            'total_household_units' => HouseholdData::select('Code', 'UnitNo')->distinct()->get()->count(),
             'total_documents'    => Document::count(),
             'pending_documents'  => Document::where('status', 'pending')->count(),
             'approved_documents' => Document::where('status', 'verified')->count(),
@@ -79,6 +81,11 @@ class AdminDashboardController extends Controller
         // Retrieve the HouseholdData record for the given family_member_id
         $householdData = HouseholdData::findOrFail($family_member_id);
         
+        // Mark notifications as read for this household member
+        Notification::where('family_member_id', $family_member_id)
+            ->where('role', 'user')
+            ->update(['read' => true]);
+
         // Access the user associated with the HouseholdData record
         $user = $householdData->user;
 
@@ -185,7 +192,12 @@ class AdminDashboardController extends Controller
     
         return redirect()->back()->with('success', 'Document rejected successfully.');
     }
-    
 
-    
+    public function clearNotifications()
+    {
+        Notification::where('role', 'user')
+            ->update(['read' => true]);
+
+        return redirect()->back()->with('success', 'All notifications cleared.');
+    }
 }

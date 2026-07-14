@@ -175,6 +175,26 @@ class HouseholdController extends Controller
         return redirect()->route('household.index')->with('success', 'Household data deleted successfully.');
     }
 
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (!empty($ids)) {
+            $members = HouseholdData::whereIn('id', $ids)->get();
+            foreach ($members as $member) {
+                $memberData = [
+                    'name' => $member->firstName . ' ' . $member->lastName,
+                    'Code' => $member->Code,
+                    'userId' => $member->userId,
+                ];
+                $memberId = $member->id;
+                $member->delete();
+                \App\Services\AuditLogger::log('delete', 'household_member', $memberId, $memberData);
+            }
+            return redirect()->route('household.index')->with('success', 'Selected household members deleted successfully.');
+        }
+        return redirect()->route('household.index')->with('error', 'No household members selected.');
+    }
+
     public function importHouseholdRow(Request $request)
     {
         $rowData = $request->input('row');

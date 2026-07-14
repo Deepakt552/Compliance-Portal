@@ -178,7 +178,17 @@
                     
                     <div class="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
                         <span class="text-sm font-bold text-[#0e1e3a]">Notifications</span>
-                        <span class="text-xs bg-red-100 text-[#ef3b45] px-2 py-0.5 rounded-full font-semibold">{{ $userNotificationCount }} New</span>
+                        <div class="flex items-center space-x-2">
+                            @if($userNotificationCount > 0)
+                                <form action="{{ route('admin.notifications.clearAll') }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-[10px] text-gray-500 hover:text-[#ef3b45] font-bold underline focus:outline-none">
+                                        Clear All
+                                    </button>
+                                </form>
+                            @endif
+                            <span class="text-xs bg-red-100 text-[#ef3b45] px-2 py-0.5 rounded-full font-semibold">{{ $userNotificationCount }} New</span>
+                        </div>
                     </div>
 
                     <div class="max-h-72 overflow-y-auto divide-y divide-gray-100">

@@ -240,4 +240,13 @@ if ($property) {
             'documents' => $rejected,
         ]);
     }
+
+    public function clearNotifications()
+    {
+        Notification::where('user_id', Auth::id())
+            ->where('role', 'Admin')
+            ->update(['read' => true]);
+
+        return redirect()->back()->with('success', 'All notifications cleared.');
+    }
 }

@@ -17,7 +17,7 @@
         </div>
 
         <!-- 1. Stats and Analytics Summary Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
             <!-- Properties Card -->
             <div class="bg-white rounded-2xl border border-gray-200/80 border-l-4 border-l-blue-500 p-5 flex items-center space-x-4 transition-all duration-200 hover:shadow-md hover:border-r hover:border-r-blue-500/10">
                 <div class="p-3.5 rounded-xl bg-blue-50 text-blue-700 border border-blue-100">
@@ -40,6 +40,17 @@
                 </div>
             </div>
 
+            <!-- Active Users Card -->
+            <div class="bg-white rounded-2xl border border-gray-200/80 border-l-4 border-l-green-500 p-5 flex items-center space-x-4 transition-all duration-200 hover:shadow-md hover:border-r hover:border-r-green-500/10">
+                <div class="p-3.5 rounded-xl bg-green-50 text-green-700 border border-green-100">
+                    <i class="fas fa-user-check text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider">Active Users</p>
+                    <p class="text-2xl font-extrabold text-gray-800 mt-0.5">{{ $metrics['total_active_users'] }}</p>
+                </div>
+            </div>
+
             <!-- Total Members Card -->
             <div class="bg-white rounded-2xl border border-gray-200/80 border-l-4 border-l-purple-500 p-5 flex items-center space-x-4 transition-all duration-200 hover:shadow-md hover:border-r hover:border-r-purple-500/10">
                 <div class="p-3.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-100">
@@ -48,6 +59,17 @@
                 <div>
                     <p class="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider">Household Members</p>
                     <p class="text-2xl font-extrabold text-gray-800 mt-0.5">{{ $metrics['total_households'] }}</p>
+                </div>
+            </div>
+
+            <!-- Household Units Card -->
+            <div class="bg-white rounded-2xl border border-gray-200/80 border-l-4 border-l-yellow-500 p-5 flex items-center space-x-4 transition-all duration-200 hover:shadow-md hover:border-r hover:border-r-yellow-500/10">
+                <div class="p-3.5 rounded-xl bg-yellow-50 text-yellow-600 border border-yellow-100">
+                    <i class="fas fa-door-open text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider">Household Units</p>
+                    <p class="text-2xl font-extrabold text-gray-800 mt-0.5">{{ $metrics['total_household_units'] }}</p>
                 </div>
             </div>
 
@@ -244,7 +266,18 @@
                                                 {{ strtoupper(substr($user->firstName, 0, 1) . substr($user->lastName, 0, 1)) }}
                                             </div>
                                             <div class="ml-4">
-                                                <div class="text-sm font-bold text-gray-900">{{ $user->firstName }} {{ $user->lastName }}</div>
+                                                <div class="flex items-center space-x-2">
+                                                    <div class="text-sm font-bold text-gray-900">{{ $user->firstName }} {{ $user->lastName }}</div>
+                                                    @php
+                                                        $primaryUser = $user->user;
+                                                        $isUserActive = $primaryUser && $primaryUser->ChangePwd && $primaryUser->ContactDetails;
+                                                    @endphp
+                                                    @if($isUserActive)
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold bg-green-50 text-green-700 border border-green-200">Active</span>
+                                                    @else
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold bg-gray-50 text-gray-400 border border-gray-200" title="Pending password change/contact update">Pending</span>
+                                                    @endif
+                                                </div>
                                                 <div class="text-[10px] text-gray-400 font-semibold mt-0.5">HoH Representative ID: {{ $user->userId ?? 'N/A' }}</div>
                                             </div>
                                         </div>

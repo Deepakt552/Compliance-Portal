@@ -32,6 +32,7 @@ Route::get('/users/create', [UserController::class, 'create'])->name('users.crea
 Route::post('/users', [UserController::class, 'store'])->name('users.store');
 Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
 Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+Route::delete('/users/bulk-delete', [UserController::class, 'bulkDestroy'])->name('users.bulkDestroy');
 Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 Route::get('/users/search', [UserController::class, 'search'])->name('users.search');
 
@@ -82,6 +83,7 @@ Route::get('/household/create', [HouseholdController::class, 'create'])->name('h
 Route::post('/household/store', [HouseholdController::class, 'store'])->name('household.store');
 Route::get('/household/{id}/edit', [HouseholdController::class, 'edit'])->name('household.edit');
 Route::put('/household/{id}/update', [HouseholdController::class, 'update'])->name('household.update');
+Route::delete('/household/bulk-delete', [HouseholdController::class, 'bulkDestroy'])->name('household.bulkDestroy');
 Route::delete('/household/{id}/destroy', [HouseholdController::class, 'destroy'])->name('household.destroy');
 Route::get('/household/search', [HouseholdController::class, 'search'])->name('household.search');
 
@@ -97,6 +99,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
     Route::post('/upload-document', [UserDashboardController::class, 'uploadDocument'])->name('upload.document');
     Route::get('/user/rejected-documents', [UserDashboardController::class, 'getRejectedDocuments'])->name('user.rejected.documents');
+    Route::post('/notifications/clear-all', [UserDashboardController::class, 'clearNotifications'])->name('notifications.clearAll');
 });
 Route::post('/reupload-document', [UserDashboardController::class, 'reuploadDocument'])->name('reupload.document');
 
@@ -122,6 +125,7 @@ Route::get('/user-dashboard/upload-document/{userId}', [UserDashboardController:
 // admin dashboard routes
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 Route::get('/admin/show-user-documents/{family_member_id}', [AdminDashboardController::class, 'showUserDocuments'])->name('admin.showUserDocuments');
+Route::post('/admin/notifications/clear-all', [AdminDashboardController::class, 'clearNotifications'])->name('admin.notifications.clearAll');
 
 
 // Route::post('/admin/documents/approve/{documentId}', [AdminDashboardController::class, 'approveDocument'])

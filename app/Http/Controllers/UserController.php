@@ -151,4 +151,25 @@ class UserController extends Controller
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully');
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (!empty($ids)) {
+            $users = User::whereIn('id', $ids)->get();
+            foreach ($users as $user) {
+                $userData = [
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'UserId' => $user->UserId,
+                    'Code' => $user->Code,
+                ];
+                $userId = $user->id;
+                $user->delete();
+                \App\Services\AuditLogger::log('delete', 'user', $userId, $userData);
+            }
+            return redirect()->route('users.index')->with('success', 'Selected users deleted successfully.');
+        }
+        return redirect()->route('users.index')->with('error', 'No users selected.');
+    }
 }
