@@ -115,8 +115,6 @@ Route::get('/user-dashboard/upload-document/{userId}', [UserDashboardController:
     
     use App\Http\Controllers\DocumentController;
     
-    Route::get('/documents/{familyMemberId}', [DocumentController::class, 'index'])->name('documents.index');
-    
     require __DIR__.'/auth.php';
 
 
