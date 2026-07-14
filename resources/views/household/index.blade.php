@@ -24,26 +24,65 @@
 
         <!-- Filters & Search Form -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-150 p-6">
-            <form action="{{ route('household.search') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3">
-                <div class="relative flex-1 w-full">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none">
-                        <i class="fas fa-search text-xs"></i>
-                    </span>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by property code, unit number, or name"
-                           class="pl-9 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5"
-                           style="padding-left: 2.25rem;">
+            <form action="{{ route('household.index') }}" method="GET" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Text Search -->
+                    <div>
+                        <label for="search" class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Search Query</label>
+                        <div class="relative w-full">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none">
+                                <i class="fas fa-search text-xs"></i>
+                            </span>
+                            <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Name, code, or unit..."
+                                   class="pl-9 block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-xs py-2.5"
+                                   style="padding-left: 2.25rem;">
+                        </div>
+                    </div>
+
+                    <!-- Property Filter -->
+                    <div>
+                        <label for="code" class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Property Name</label>
+                        <select name="code" id="code" onchange="updateUnitNumbers()"
+                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-xs py-2.5">
+                            <option value="">All Properties</option>
+                            @foreach($codes as $code)
+                                @if(isset($propertyNames[$code]))
+                                    <option value="{{ $code }}" @if(request('code') == $code) selected @endif>
+                                        {{ $propertyNames[$code] }}
+                                    </option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- UnitNo Filter -->
+                    <div>
+                        <label for="unitNo" class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Unit Number</label>
+                        <select name="unitNo" id="unitNo"
+                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-xs py-2.5">
+                            <option value="">All Units</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-2 w-full sm:w-auto">
-                    <button type="submit"
-                            class="w-full sm:w-auto px-6 py-2.5 bg-[#0e1e3a] hover:bg-[#1a3461] text-white text-sm font-bold rounded-xl transition shadow-sm">
-                        Search
-                    </button>
-                    @if(request('search'))
-                        <a href="{{ route('household.index') }}"
-                           class="py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-xl transition text-center flex items-center justify-center">
-                            Clear
-                        </a>
-                    @endif
+
+                <div class="flex items-center justify-between gap-3 pt-2">
+                    <span class="text-[11px] text-gray-400 font-medium">
+                        @if($householdData->total() > 0)
+                            Showing {{ $householdData->firstItem() }}-{{ $householdData->lastItem() }} of {{ $householdData->total() }} records
+                        @endif
+                    </span>
+                    <div class="flex items-center space-x-2">
+                        <button type="submit"
+                                class="px-6 py-2.5 bg-[#0e1e3a] hover:bg-[#1a3461] text-white text-xs font-bold rounded-xl transition shadow-sm flex items-center">
+                            <i class="fas fa-filter mr-1.5 text-xs"></i> Apply Filters
+                        </button>
+                        @if(request('search') || request('code') || request('unitNo'))
+                            <a href="{{ route('household.index') }}"
+                               class="py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition text-center flex items-center justify-center">
+                                <i class="fas fa-undo mr-1.5"></i> Reset
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </form>
         </div>
@@ -148,6 +187,37 @@
 </x-admin-layout>
 
 <script>
+function updateUnitNumbers() {
+    var selectedCode = document.getElementById('code').value;
+    var unitNoSelect = document.getElementById('unitNo');
+    var unitNumbers = @json($unitNumbers); 
+
+    // Clear existing options
+    unitNoSelect.innerHTML = '';
+
+    // Add 'All' option
+    var allOption = document.createElement('option');
+    allOption.value = '';
+    allOption.text = 'All Units';
+    unitNoSelect.add(allOption);
+
+    // Add options based on the selected code
+    if (selectedCode && unitNumbers[selectedCode]) {
+        unitNumbers[selectedCode].forEach(function(unitNo) {
+            var option = document.createElement('option');
+            option.value = unitNo;
+            option.text = unitNo;
+            if ("{{ request('unitNo') }}" == unitNo) {
+                option.selected = true;
+            }
+            unitNoSelect.add(option);
+        });
+    }
+}
+
+// Initial call to load active selection on page load
+updateUnitNumbers();
+
 document.addEventListener('DOMContentLoaded', function () {
     const selectAll = document.getElementById('select-all-household');
     const checkboxes = document.querySelectorAll('.household-checkbox');

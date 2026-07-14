@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Imports\HouseholdDataImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\HouseholdData;
+use App\Models\Properties;
 use App\Http\Middleware\AdminAuthenticate;
 
 
@@ -47,24 +48,61 @@ class HouseholdController extends Controller
     
     // CRUD operations for HouseholdData
 
-    public function index()
+    public function index(Request $request)
     {
-        $householdData = HouseholdData::paginate(10);
-        return view('household.index', compact('householdData'));
+        // Get distinct codes for filtering
+        $codes = Properties::distinct('Code')->pluck('Code');
+    
+        // Pass unit numbers and property names based on code to the view
+        $unitNumbers = $this->getUnitNumbersByCode();
+        $propertyNames = Properties::pluck('Property', 'Code');
+    
+        // Apply filters
+        $query = HouseholdData::query();
+
+        // 1. Search Query
+        if ($request->has('search') && $request->input('search') != '') {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('Code', 'like', "%$search%")
+                  ->orWhere('UnitNo', 'like', "%$search%")
+                  ->orWhere('userId', 'like', "%$search%")
+                  ->orWhere('FirstName', 'like', "%$search%")
+                  ->orWhere('LastName', 'like', "%$search%");
+            });
+        }
+
+        // 2. Dropdown Property Code filter
+        if ($request->has('code') && $request->input('code') != '') {
+            $query->where('Code', $request->input('code'));
+        }
+
+        // 3. Dropdown Unit number filter
+        if ($request->has('unitNo') && $request->input('unitNo') != '') {
+            $query->where('UnitNo', $request->input('unitNo'));
+        }
+    
+        // Paginate the results
+        $householdData = $query->paginate(10);
+    
+        return view('household.index', compact('householdData', 'codes', 'unitNumbers', 'propertyNames'));
     }
 
     public function search(Request $request)
     {
-        $search = $request->input('search');
-    
-        $householdData = HouseholdData::where('Code', 'like', "%$search%")
-            ->orWhere('UnitNo', 'like', "%$search%")
-            ->orWhere('userId', 'like', "%$search%")
-            ->orWhere('FirstName', 'like', "%$search%")
-            ->orWhere('LastName', 'like', "%$search%")
-            ->paginate(8);
-    
-        return view('household.index', compact('householdData'));
+        return $this->index($request);
+    }
+
+    private function getUnitNumbersByCode()
+    {
+        $unitNumbersByCode = HouseholdData::select('Code', 'UnitNo')->distinct()->get()->groupBy('Code');
+        $unitNumbers = [];
+
+        foreach ($unitNumbersByCode as $code => $units) {
+            $unitNumbers[$code] = $units->pluck('UnitNo')->unique()->toArray();
+        }
+
+        return $unitNumbers;
     }
 
     public function create()
