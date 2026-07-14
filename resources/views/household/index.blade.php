@@ -188,8 +188,11 @@
 
 <script>
 function updateUnitNumbers() {
-    var selectedCode = document.getElementById('code').value;
+    var codeEl = document.getElementById('code');
     var unitNoSelect = document.getElementById('unitNo');
+    if (!codeEl || !unitNoSelect) return;
+
+    var selectedCode = codeEl.value;
     var unitNumbers = @json($unitNumbers); 
 
     // Clear existing options
@@ -215,10 +218,10 @@ function updateUnitNumbers() {
     }
 }
 
-// Initial call to load active selection on page load
-updateUnitNumbers();
-
 document.addEventListener('DOMContentLoaded', function () {
+    // Initial call to load active selection on page load once DOM is ready
+    updateUnitNumbers();
+
     const selectAll = document.getElementById('select-all-household');
     const checkboxes = document.querySelectorAll('.household-checkbox');
     const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
