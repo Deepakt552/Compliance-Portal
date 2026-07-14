@@ -198,7 +198,8 @@ function updateUnitNumbers() {
     console.log("Household Filter Debug:", {
         selectedCode: selectedCode,
         unitNumbers: unitNumbers,
-        matchedUnits: unitNumbers[selectedCode]
+        matchedUnits: unitNumbers[selectedCode],
+        allKeys: Object.keys(unitNumbers)
     }); 
 
     // Clear existing options
