@@ -139,7 +139,15 @@ Route::post('/admin/reject-document/{documentId}', [AdminDashboardController::cl
 // Route::get('/admin/dashboard', function () {
 //     return view('admin.dashboard');
 // })->middleware(['auth', 'verified'])->name('admin.dashboard');
-Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->middleware(['auth:admin'])->name('admin.dashboard');
+// Admin Settings & Email Logs routes
+Route::group(['middleware' => ['auth:admin'], 'prefix' => 'admin', 'as' => 'admin.'], function() {
+    Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('settings.update');
+
+    Route::get('/email-logs', [\App\Http\Controllers\EmailLogController::class, 'index'])->name('email-logs.index');
+    Route::get('/email-logs/{id}', [\App\Http\Controllers\EmailLogController::class, 'show'])->name('email-logs.show');
+});
+
 require __DIR__.'/adminauth.php';
 
 

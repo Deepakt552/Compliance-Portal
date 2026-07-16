@@ -44,6 +44,8 @@
                     ['route' => 'documents.index', 'icon' => 'fa-file-alt', 'label' => 'Manage Documents'],
                     ['route' => 'properties.index', 'icon' => 'fa-building', 'label' => 'Manage Properties'],
                     ['route' => 'admins.index', 'icon' => 'fa-user-shield', 'label' => 'Manage Admins'],
+                    ['route' => 'admin.settings.index', 'icon' => 'fa-cog', 'label' => 'Notification Settings'],
+                    ['route' => 'admin.email-logs.index', 'icon' => 'fa-envelope-open-text', 'label' => 'Email Logs'],
                 ];
             @endphp
 
@@ -144,6 +146,10 @@
                     Property Management
                 @elseif(request()->routeIs('admins.*'))
                     Admin Management
+                @elseif(request()->routeIs('admin.settings.*'))
+                    Notification Settings
+                @elseif(request()->routeIs('admin.email-logs.*'))
+                    Email Logs
                 @else
                     Admin Console
                 @endif
@@ -193,7 +199,7 @@
 
                     <div class="max-h-72 overflow-y-auto divide-y divide-gray-100">
                         @php
-                            $limitedNotifications = $userNotifications->reverse()->take(10);
+                            $limitedNotifications = $userNotifications->take(10);
                         @endphp
                         @forelse ($limitedNotifications as $notification)
                             @if ($notification->role == 'user')

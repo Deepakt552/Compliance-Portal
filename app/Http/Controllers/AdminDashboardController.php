@@ -196,7 +196,7 @@ class AdminDashboardController extends Controller
     public function clearNotifications()
     {
         Notification::where('role', 'user')
-            ->update(['read' => true]);
+            ->delete();
 
         return redirect()->back()->with('success', 'All notifications cleared.');
     }

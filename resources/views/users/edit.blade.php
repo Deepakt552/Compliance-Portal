@@ -22,14 +22,14 @@
                     <!-- Name -->
                     <div>
                         <label for="name" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Display Name</label>
-                        <input type="text" name="name" id="name" value="{{ $user->name }}" required autocomplete="off"
+                        <input type="text" name="name" id="name" value="{{ $user->name }}" autocomplete="off"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Email Address</label>
-                        <input type="email" name="email" id="email" value="{{ $user->email }}" required autocomplete="off"
+                        <input type="email" name="email" id="email" value="{{ $user->email }}" autocomplete="off"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
@@ -43,56 +43,56 @@
                     <!-- User ID -->
                     <div>
                         <label for="UserId" class="block text-xs font-semibold text-gray-500 uppercase mb-2">User ID</label>
-                        <input type="text" name="UserId" id="UserId" value="{{ $user->UserId }}" required
+                        <input type="text" name="UserId" id="UserId" value="{{ $user->UserId }}"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- Unit Number -->
                     <div>
                         <label for="UnitNo" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Unit Number</label>
-                        <input type="text" name="UnitNo" id="UnitNo" value="{{ $user->UnitNo }}" required
+                        <input type="text" name="UnitNo" id="UnitNo" value="{{ $user->UnitNo }}"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- First Name -->
                     <div>
                         <label for="FirstName" class="block text-xs font-semibold text-gray-500 uppercase mb-2">First Name</label>
-                        <input type="text" name="FirstName" id="FirstName" value="{{ $user->FirstName }}" required
+                        <input type="text" name="FirstName" id="FirstName" value="{{ $user->FirstName }}"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- Last Name -->
                     <div>
                         <label for="LastName" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Last Name</label>
-                        <input type="text" name="LastName" id="LastName" value="{{ $user->LastName }}" required
+                        <input type="text" name="LastName" id="LastName" value="{{ $user->LastName }}"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- Age -->
                     <div>
                         <label for="Age" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Age</label>
-                        <input type="number" name="Age" id="Age" value="{{ $user->Age }}" required min="1"
+                        <input type="number" name="Age" id="Age" value="{{ $user->Age }}" min="1"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- Family Size -->
                     <div>
                         <label for="FamilySize" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Family Size</label>
-                        <input type="number" name="FamilySize" id="FamilySize" value="{{ $user->FamilySize }}" required min="1"
+                        <input type="number" name="FamilySize" id="FamilySize" value="{{ $user->FamilySize }}" min="1"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- Certification Date -->
                     <div>
                         <label for="CertificationDate" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Certification Date</label>
-                        <input type="date" name="CertificationDate" id="CertificationDate" value="{{ $user->CertificationDate }}" required
+                        <input type="date" name="CertificationDate" id="CertificationDate" value="{{ $user->CertificationDate }}"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
                     <!-- Recertification Date -->
                     <div>
                         <label for="RecertificationDate" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Recertification Date</label>
-                        <input type="date" name="RecertificationDate" id="RecertificationDate" value="{{ $user->RecertificationDate }}" required
+                        <input type="date" name="RecertificationDate" id="RecertificationDate" value="{{ $user->RecertificationDate }}"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
 
@@ -126,7 +126,7 @@
                     <!-- Property Code -->
                     <div>
                         <label for="Code" class="block text-xs font-semibold text-gray-500 uppercase mb-2">Property Code</label>
-                        <input type="text" name="Code" id="Code" value="{{ $user->Code }}" required
+                        <input type="text" name="Code" id="Code" value="{{ $user->Code }}"
                                class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-[#0e1e3a] focus:ring focus:ring-[#0e1e3a] focus:ring-opacity-20 text-sm py-2.5">
                     </div>
                 </div>

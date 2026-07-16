@@ -120,18 +120,34 @@ if ($property) {
 
     
             $notification->save();
-            
-            try {
-                Mail::to($user->email)->send(new DocumentUploaded($document));
-            } catch (\Exception $e) {
-                // Ignore mail sending error
+
+            // Resolve document upload notification recipients from settings
+            $recipients = [];
+            $notifType = \App\Models\Setting::get('document_notification_type', 'subscribed_admins');
+
+            if ($notifType === 'subscribed_admins') {
+                $recipients = \App\Models\Admin::where('receive_upload_notifications', true)->pluck('email')->toArray();
+            } elseif ($notifType === 'specific_admin') {
+                $adminId = \App\Models\Setting::get('document_notification_admin_id');
+                $admin = \App\Models\Admin::find($adminId);
+                if ($admin) {
+                    $recipients[] = $admin->email;
+                }
+            } elseif ($notifType === 'custom_email') {
+                $customEmail = \App\Models\Setting::get('document_notification_custom_email');
+                if ($customEmail) {
+                    $recipients[] = $customEmail;
+                }
             }
 
-            // Retrieve all admins subscribed to document upload alerts
-            $subscribedAdmins = \App\Models\Admin::where('receive_upload_notifications', true)->get();
-            foreach ($subscribedAdmins as $admin) {
+            // Fallback to default if no recipients resolved
+            if (empty($recipients)) {
+                $recipients = \App\Models\Admin::where('receive_upload_notifications', true)->pluck('email')->toArray();
+            }
+
+            foreach ($recipients as $recipientEmail) {
                 try {
-                    Mail::to($admin->email)->send(new DocumentUploaded($document));
+                    Mail::to($recipientEmail)->send(new DocumentUploaded($document));
                 } catch (\Exception $e) {
                     // Ignore mail sending error
                 }
@@ -245,7 +261,7 @@ if ($property) {
     {
         Notification::where('user_id', Auth::id())
             ->where('role', 'Admin')
-            ->update(['read' => true]);
+            ->delete();
 
         return redirect()->back()->with('success', 'All notifications cleared.');
     }

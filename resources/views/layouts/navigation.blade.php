@@ -76,7 +76,7 @@
 
                         <div class="max-h-64 overflow-y-auto divide-y divide-gray-100">
                             @php
-                                $limitedNotifications = $notifications->reverse()->take(10);
+                                $limitedNotifications = $notifications->take(10);
                             @endphp
                             @forelse ($limitedNotifications as $notification)
                                 @if ($notification->role == 'Admin')
@@ -180,7 +180,7 @@
                             <span class="text-[10px] bg-red-50 text-[#ef3b45] font-bold px-2 py-0.5 rounded-full border border-red-100">{{ $notificationCount }} Alert</span>
                         </div>
                         <div class="max-h-56 overflow-y-auto divide-y divide-gray-100">
-                            @php $limitedMobile = $notifications->reverse()->take(8); @endphp
+                            @php $limitedMobile = $notifications->take(8); @endphp
                             @forelse ($limitedMobile as $notification)
                                 @if ($notification->role == 'Admin')
                                     @php
